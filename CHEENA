@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Be My Valentine 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Floating hearts */
+  .heart {
+    position: absolute;
+    color: rgba(255,255,255,0.8);
+    font-size: 20px;
+    animation: float 6s linear infinite;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(100vh); opacity: 1; }
+    100% { transform: translateY(-10vh); opacity: 0; }
+  }
+
+  /* Confetti styles */
+  #confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: none;
+  }
+
+  .card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    width: 350px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    z-index: 10;
+    user-select: none;
+  }
+
+  h1 {
+    color: #ff3366;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 18px;
+    color: #444;
+  }
+
+  button {
+    padding: 12px 28px;
+    font-size: 16px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin: 10px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  #yesBtn {
+    background-color: #ff3366;
+    color: white;
+  }
+
+  #noBtn {
+    background-color: #e0e0e0;
+    position: absolute;
+  }
+
+  img {
+    width: 100%;
+    border-radius: 15px;
+    margin-top: 15px;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Background Music -->
+<audio id="bg-music" autoplay loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/26/audio_b9a0b744bb.mp3?filename=romantic-piano-11678.mp3" type="audio/mpeg" />
+</audio>
+
+<!-- Confetti Canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- STEP 1 -->
+<div class="card" id="step1">
+  <h1>Anushka ❤️</h1>
+  <p>Will you be my Valentine?</p>
+  <button onclick="goToStep2()">Next 💌</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="card" id="step2" style="display:none; position:relative;">
+  <h1>So… what do you say? 😏</h1>
+  <button id="yesBtn" onclick="goToStep3()">YES 💖</button>
+  <button id="noBtn">NO 🙃</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="card" id="step3" style="display:none;">
+  <h1>She Said YES! 💃🕺</h1>
+  <p>Now you’re officially mine ❤️</p>
+  <img src="https://media.tenor.com/9G8gXqJ0X9kAAAAC/ram-leela-deepika-ranveer.gif" alt="Ram Leela Celebration" />
+</div>
+
+<script>
+  // Steps navigation
+  function goToStep2() {
+    document.getElementById("step1").style.display = "none";
+    document.getElementById("step2").style.display = "block";
+  }
+
+  function goToStep3() {
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step3").style.display = "block";
+    startConfetti();
+  }
+
+  // NO button running away
+  const noBtn = document.getElementById("noBtn");
+  noBtn.addEventListener("mouseover", () => {
+    const padding = 120;
+    const x = Math.random() * (window.innerWidth - padding);
+    const y = Math.random() * (window.innerHeight - padding);
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+  });
+
+  // Floating hearts animation
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "❤️";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = Math.random() * 20 + 15 + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+  }, 300);
+
+  // Confetti effect
+  const confettiCanvas = document.getElementById('confetti-canvas');
+  const ctx = confettiCanvas.getContext('2d');
+  let confettiParticles = [];
+
+  function resizeCanvas() {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  class ConfettiParticle {
+    constructor() {
+      this.x = Math.random() * confettiCanvas.width;
+      this.y = Math.random() * confettiCanvas.height - confettiCanvas.height;
+      this.size = Math.random() * 8 + 4;
+      this.speedY = Math.random() * 3 + 2;
+      this.speedX = (Math.random() - 0.5) * 2;
+      this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+      this.opacity = 1;
+      this.gravity = 0.05;
+      this.rotation = Math.random() * 360;
+      this.rotationSpeed = (Math.random() - 0.5) * 10;
+    }
+
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.speedY += this.gravity;
+      this.rotation += this.rotationSpeed;
+      this.opacity -= 0.01;
+      if (this.opacity < 0) this.opacity = 0;
+    }
+
+    draw(ctx) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate((this.rotation * Math.PI) / 180);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = this.opacity;
+      ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+      ctx.restore();
+    }
+  }
+
+  function startConfetti() {
+    confettiCanvas.style.display = 'block';
+    confettiParticles = [];
+    for (let i = 0; i < 150; i++) {
+      confettiParticles.push(new ConfettiParticle());
+    }
+    requestAnimationFrame(updateConfetti);
+  }
+
+  function updateConfetti() {
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    confettiParticles.forEach((p, i) => {
+      p.update();
+      p.draw(ctx);
+      if (p.opacity <= 0) {
+        confettiParticles.splice(i, 1);
+      }
+    });
+
+    if (confettiParticles.length > 0) {
+      requestAnimationFrame(updateConfetti);
+    } else {
+      confettiCanvas.style.display = 'none';
+    }
+  }
+</script>
+
+</body>
+</html>
